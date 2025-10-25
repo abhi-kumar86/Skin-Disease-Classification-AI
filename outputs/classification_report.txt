@@ -1,0 +1,16 @@
+IMPROVED MODEL RESULTS
+================================================================================
+
+Test Accuracy: 94.00%
+
+                   precision    recall  f1-score   support
+
+             acne     0.8636    0.9942    0.9243       172
+hyperpigmentation     0.9524    0.9524    0.9524       105
+   nail_psoriasis     0.9115    0.9815    0.9452       378
+          sjs_ten     0.9754    0.9179    0.9458       475
+         vitiligo     0.9746    0.8878    0.9292       303
+
+         accuracy                         0.9400      1433
+        macro avg     0.9355    0.9467    0.9394      1433
+     weighted avg     0.9433    0.9400    0.9400      1433
