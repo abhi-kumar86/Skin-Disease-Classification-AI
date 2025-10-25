@@ -1,8 +1,3 @@
-"""
-IMPROVED Skin Disease Classification Training Script
-Fixes: Low accuracy, Class imbalance, Poor learning
-"""
-
 import os
 import numpy as np
 import pandas as pd
@@ -26,7 +21,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications import EfficientNetB0
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint, LearningRateScheduler
 
-# ==================== CONFIGURATION ====================
+#  CONFIGURATION PART
 class Config:
     DATA_DIR = 'dataset'
     CLASSES = ['acne', 'hyperpigmentation', 'nail_psoriasis', 'sjs_ten', 'vitiligo']
@@ -68,7 +63,7 @@ print(f"TensorFlow: {tf.__version__}")
 print(f"Seed: {config.RANDOM_SEED}")
 print("="*80)
 
-# ==================== LOAD DATA ====================
+# LOAD DATA
 print("\n[1] Loading Dataset...")
 
 all_paths = []
@@ -98,7 +93,7 @@ if len(all_paths) == 0:
 all_paths = np.array(all_paths)
 all_labels = np.array(all_labels)
 
-# ==================== SPLIT ====================
+#  SPLIT 
 print("\n[2] Splitting...")
 
 X_train, X_temp, y_train, y_temp = train_test_split(
@@ -113,7 +108,7 @@ print(f"Train: {len(X_train)} ({len(X_train)/len(all_paths)*100:.1f}%)")
 print(f"Val:   {len(X_val)} ({len(X_val)/len(all_paths)*100:.1f}%)")
 print(f"Test:  {len(X_test)} ({len(X_test)/len(all_paths)*100:.1f}%)")
 
-# ==================== CLASS WEIGHTS ====================
+# CLASS WEIGHTS 
 print("\n[3] Computing Class Weights...")
 
 unique_classes = np.unique(y_train)
@@ -129,7 +124,7 @@ print("Weights:")
 for idx, cls in enumerate(config.CLASSES):
     print(f"  {cls:20s}: {class_weight_dict.get(idx, 1.0):.2f}")
 
-# ==================== DATA GENERATORS ====================
+# DATA GENERATORS 
 print("\n[4] Creating Generators...")
 
 # IMPROVED AUGMENTATION
@@ -182,7 +177,7 @@ test_gen = val_test_datagen.flow_from_dataframe(
 
 print(f"✅ Generators ready: {len(train_gen)} batches")
 
-# ==================== BUILD MODEL ====================
+# BUILD MODEL 
 print("\n[5] Building Model...")
 
 base_model = EfficientNetB0(
@@ -233,7 +228,7 @@ trainable_params = sum([int(np.prod(w.shape)) for w in model.trainable_weights])
 print(f"\nTotal: {total_params:,}")
 print(f"Trainable: {trainable_params:,} ({trainable_params/total_params*100:.1f}%)")
 
-# ==================== CALLBACKS ====================
+# CALLBACKS
 print("\n[6] Setting Callbacks...")
 
 def lr_schedule(epoch, lr):
@@ -251,7 +246,7 @@ callbacks = [
                     monitor='val_accuracy', save_best_only=True, verbose=1)
 ]
 
-# ==================== TRAIN ====================
+# TRAIN
 print("\n[7] Training...")
 print("="*80)
 
@@ -266,7 +261,7 @@ history = model.fit(
 
 print("\n✅ Training Done!")
 
-# ==================== PLOT HISTORY ====================
+# PLOT HISTORY 
 print("\n[8] Plotting...")
 
 fig, axes = plt.subplots(2, 2, figsize=(16, 12))
@@ -370,7 +365,7 @@ with open(os.path.join(config.MODEL_DIR, 'model_info.json'), 'w') as f:
     json.dump(model_info, f, indent=4)
 print(f"✅ Saved: model_info.json")
 
-# ==================== SUMMARY ====================
+# SUMMARY
 print("\n" + "="*80)
 print("TRAINING SUMMARY")
 print("="*80)
@@ -387,4 +382,5 @@ print(f"\n🎯 Test: {test_acc*100:.2f}%")
 print("\n" + "="*80)
 print("✅ DONE!")
 print("="*80)
+
 print("\nNext: python app.py")
