@@ -1,9 +1,3 @@
-"""
-Exploratory Data Analysis for Skin Disease Classification
-Dataset: 5 classes (acne, hyperpigmentation, nail_psoriasis, sjs_ten, vitiligo)
-Dataset Source: https://data.mendeley.com/datasets/3hckgznc67/1
-"""
-
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -17,7 +11,7 @@ warnings.filterwarnings('ignore')
 sns.set_style('whitegrid')
 plt.rcParams['figure.figsize'] = (14, 8)
 
-# ==================== CONFIGURATION ====================
+# CONFIGURATION part
 DATA_DIR = 'dataset'
 CLASSES = ['acne', 'hyperpigmentation', 'nail_psoriasis', 'sjs_ten', 'vitiligo']
 OUTPUT_DIR = 'outputs'
@@ -41,7 +35,7 @@ print(f"Dataset Source: https://data.mendeley.com/datasets/3hckgznc67/1")
 print(f"Number of Classes: {len(CLASSES)}")
 print("="*80)
 
-# ==================== SECTION 1: COUNT IMAGES ====================
+# COUNTING IMAGES
 print("\n[STEP 1] Counting Images in Each Class...")
 
 class_counts = {}
@@ -79,7 +73,7 @@ if total_images == 0:
     print("└── vitiligo/")
     exit(1)
 
-# ==================== SECTION 2: CLASS DISTRIBUTION ====================
+# CLASS DISTRIBUTION part
 print("\n" + "="*80)
 print("[STEP 2] Class Distribution Analysis")
 print("="*80)
@@ -135,7 +129,7 @@ plt.savefig(output_path, dpi=300, bbox_inches='tight')
 print(f"\n✅ Class distribution plot saved: {output_path}")
 plt.close()
 
-# ==================== SECTION 3: SAMPLE IMAGES ====================
+# SAMPLE IMAGES
 print("\n" + "="*80)
 print("[STEP 3] Generating Sample Image Grid")
 print("="*80)
@@ -259,7 +253,7 @@ if image_widths:
     print(f"\n✅ Image properties plot saved: {output_path}")
     plt.close()
 
-# ==================== FINAL SUMMARY ====================
+# FINAL EDA  SUMMARY REPORT
 print("\n" + "="*80)
 print("EDA SUMMARY REPORT")
 print("="*80)
@@ -289,4 +283,5 @@ print("\n📋 Next Steps:")
 print("1. Review the generated plots in 'outputs/' folder")
 print("2. Check class balance - consider data augmentation if needed")
 print("3. Run training: python train.py")
+
 print("="*80)
