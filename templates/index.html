@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skin Disease Classification | AI Diagnostic System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .header .subtitle {
+            font-size: 0.9rem;
+            margin-top: 10px;
+            opacity: 0.85;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .upload-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 20px;
+            background: #f8f9ff;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+            transform: translateY(-2px);
+        }
+
+        .upload-area.dragover {
+            border-color: #764ba2;
+            background: #e8ebff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .upload-hint {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .preview-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .preview-section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .image-preview {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .preview-img {
+            max-width: 500px;
+            max-height: 500px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .prediction-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .prediction-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .prediction-name {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .confidence-bar {
+            background: rgba(255,255,255,0.3);
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+            transition: width 1s ease;
+        }
+
+        .info-card {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .info-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .info-card p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .severity-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .severity-low {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .severity-low-medium {
+            background: #8BC34A;
+            color: white;
+        }
+
+        .severity-medium {
+            background: #FF9800;
+            color: white;
+        }
+
+        .severity-high {
+            background: #F44336;
+            color: white;
+        }
+
+        .severity-critical {
+            background: #D32F2F;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .all-predictions {
+            margin-top: 30px;
+        }
+
+        .all-predictions h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .prediction-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: transform 0.2s;
+        }
+
+        .prediction-item:hover {
+            transform: translateX(5px);
+            background: #f0f2ff;
+        }
+
+        .prediction-item .name {
+            flex: 1;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .prediction-item .bar {
+            flex: 2;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            margin: 0 15px;
+            overflow: hidden;
+        }
+
+        .prediction-item .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 1s ease;
+        }
+
+        .prediction-item .percentage {
+            font-weight: bold;
+            color: #667eea;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .disclaimer {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            color: #856404;
+        }
+
+        .disclaimer strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .reset-btn {
+            background: #6c757d;
+            margin-top: 20px;
+        }
+
+        .reset-btn:hover {
+            background: #5a6268;
+        }
+
+        .class-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 15px;
+        }
+
+        .class-badge {
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .class-badge .icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .class-badge .name {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .main-card {
+                padding: 20px;
+            }
+
+            .prediction-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .prediction-item .bar {
+                width: 100%;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔬 Skin Disease Classification</h1>
+            <p>AI-Powered Dermatological Analysis System</p>
+            <p class="subtitle">Premier University | Neural Network & Fuzzy Logic Project | Spring 2025</p>
+            <p>Developed by: Abhi Kumar Nath Shuva, Rohit Kumar Chowdhury, Maimuna Begum Fahima</p>
+        </div>
+
+        <div class="main-card">
+            <div class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📤</div>
+                    <div class="upload-text">Click to upload or drag & drop</div>
+                    <div class="upload-hint">Supported: JPG, PNG, JPEG, BMP (Max 16MB)</div>
+                    <input type="file" id="fileInput" accept="image/png,image/jpeg,image/jpg,image/bmp">
+                </div>
+                <button class="btn" id="analyzeBtn" disabled>🔍 Analyze Image</button>
+            </div>
+
+            <!-- Disease Classes Info -->
+            <div class="class-info">
+                <div class="class-badge">
+                    <div class="icon">🔴</div>
+                    <div class="name">Acne</div>
+                </div>
+                <div class="class-badge">
+                    <div class="icon">🟤</div>
+                    <div class="name">Hyperpigmentation</div>
+                </div>
+                <div class="class-badge">
+                    <div class="icon">💅</div>
+                    <div class="name">Nail Psoriasis</div>
+                </div>
+                <div class="class-badge">
+                    <div class="icon">🚨</div>
+                    <div class="name">SJS-TEN</div>
+                </div>
+                <div class="class-badge">
+                    <div class="icon">⚪</div>
+                    <div class="name">Vitiligo</div>
+                </div>
+            </div>
+
+            <div class="preview-section" id="previewSection">
+                <div class="image-preview">
+                    <img id="previewImg" class="preview-img" src="" alt="Preview">
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="color: #667eea; font-weight: bold;">Analyzing image... Please wait</p>
+            </div>
+
+            <div class="results-section" id="resultsSection">
+                <div class="prediction-card">
+                    <div class="prediction-title">🎯 Detected Condition:</div>
+                    <div class="prediction-name">
+                        <span id="diseaseName"></span>
+                        <span class="severity-badge" id="severityBadge"></span>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" id="confidenceFill">0%</div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>📋 Description</h3>
+                    <p id="diseaseDescription"></p>
+                </div>
+
+                <div class="info-card">
+                    <h3>💊 Recommendation</h3>
+                    <p id="diseaseRecommendation"></p>
+                </div>
+
+                <div class="all-predictions">
+                    <h3>📊 Probability Distribution</h3>
+                    <div id="allPredictionsList"></div>
+                </div>
+
+                <div class="disclaimer">
+                    <strong>⚠ Medical Disclaimer</strong>
+                    This is an AI-based educational tool and should <strong>NOT</strong> be used as a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified dermatologist or healthcare provider for medical concerns.
+                </div>
+
+                <button class="btn reset-btn" id="resetBtn">🔄 Analyze Another Image</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const previewSection = document.getElementById('previewSection');
+        const previewImg = document.getElementById('previewImg');
+        const loading = document.getElementById('loading');
+        const resultsSection = document.getElementById('resultsSection');
+        const resetBtn = document.getElementById('resetBtn');
+
+        let selectedFile = null;
+
+        // Click to upload
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        // File selection
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file (JPG, PNG, JPEG, BMP)');
+                return;
+            }
+
+            if (file.size > 16 * 1024 * 1024) {
+                alert('File size must be less than 16MB');
+                return;
+            }
+
+            selectedFile = file;
+            
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                previewSection.classList.add('active');
+                analyzeBtn.disabled = false;
+                resultsSection.classList.remove('active');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Analyze button
+        analyzeBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            // Hide results and show loading
+            resultsSection.classList.remove('active');
+            loading.classList.add('active');
+            analyzeBtn.disabled = true;
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayResults(data);
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error occurred'));
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                loading.classList.remove('active');
+            }
+        });
+
+        function displayResults(data) {
+            const { disease_info, confidence, percentage, all_predictions } = data;
+
+            // Set disease name
+            document.getElementById('diseaseName').textContent = disease_info.full_name;
+
+            // Set severity badge
+            const badge = document.getElementById('severityBadge');
+            badge.textContent = disease_info.severity;
+            const severityClass = disease_info.severity.toLowerCase().replace(/[^a-z]/g, '-');
+            badge.className = severity-badge severity-${severityClass};
+
+            // Set confidence bar
+            const confidenceFill = document.getElementById('confidenceFill');
+            setTimeout(() => {
+                confidenceFill.style.width = percentage;
+                confidenceFill.textContent = percentage;
+            }, 100);
+
+            // Set description and recommendation
+            document.getElementById('diseaseDescription').textContent = disease_info.description;
+            document.getElementById('diseaseRecommendation').textContent = disease_info.recommendation;
+
+            // Display all predictions
+            const listContainer = document.getElementById('allPredictionsList');
+            listContainer.innerHTML = '';
+            
+            all_predictions.forEach((pred, index) => {
+                const item = document.createElement('div');
+                item.className = 'prediction-item';
+                item.style.animationDelay = ${index * 0.1}s;
+                item.innerHTML = `
+                    <div class="name">${pred.name}</div>
+                    <div class="bar">
+                        <div class="bar-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="percentage">${pred.percentage}</div>
+                `;
+                listContainer.appendChild(item);
+                
+                // Animate bar
+                setTimeout(() => {
+                    item.querySelector('.bar-fill').style.width = pred.percentage;
+                }, 100 + (index * 100));
+            });
+
+            // Show results
+            resultsSection.classList.add('active');
+            
+            // Scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Reset button
+        resetBtn.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            previewSection.classList.remove('active');
+            resultsSection.classList.remove('active');
+            analyzeBtn.disabled = true;
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
