@@ -1,6 +1,7 @@
-streamlit
+flask            
+gunicorn         
 tensorflow
-keras 
+keras
 numpy
 pandas
 matplotlib
@@ -8,4 +9,3 @@ scikit-learn
 Pillow
 opencv-python
 tqdm
-gunicorn
